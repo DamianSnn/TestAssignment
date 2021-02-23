@@ -1,0 +1,22 @@
+version: "3"
+
+networks:
+  numbers-net:
+services:
+  numbers-db:
+    container_name: numbers-db
+    image: redis
+    networks:
+      - numbers-net
+    ports:
+      - 6379:6379
+  numbers-api:
+    container_name: numbers-api
+    build:
+      context: .
+    networks:
+      - numbers-net
+    ports:
+      - 8080:8080
+    depends_on:
+      - numbers-db
