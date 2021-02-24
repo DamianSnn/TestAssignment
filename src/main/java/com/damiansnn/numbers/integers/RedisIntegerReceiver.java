@@ -31,17 +31,7 @@ final class RedisIntegerReceiver implements NumberReceiver<Integer> {
   @Override
   public Either<AppError, Integer> receiveNumber() {
     try {
-      String rawRandomNumber = connection.sync().get(numberRedisKey);
-      if (rawRandomNumber != null) {
-        int randomNumber = Integer.parseInt(rawRandomNumber);
-        LOGGER.info(
-            "Number was retrieved from redis. Key: {}. Value: {}", numberRedisKey, randomNumber);
-        return Right(randomNumber);
-      } else {
-        String message = "Number was not found in redis. Key: " + numberRedisKey;
-        LOGGER.warn(message);
-        return Left(new ConnectionError(message));
-      }
+      return receiveNumberFromRedis();
     } catch (RuntimeException exc) {
       LOGGER.warn(
           "There was an exception while retrieving number from redis. Key: {}. "
@@ -52,6 +42,19 @@ final class RedisIntegerReceiver implements NumberReceiver<Integer> {
       String errorMessage =
           exc.getMessage() != null ? exc.getMessage() : exc.getClass().getSimpleName();
       return Left(new ConnectionError(errorMessage));
+    }
+  }
+
+  private Either<AppError, Integer> receiveNumberFromRedis() {
+    String rawNumber = connection.sync().get(numberRedisKey);
+    if (rawNumber != null) {
+      int number = Integer.parseInt(rawNumber);
+      LOGGER.info("Number was retrieved from redis. Key: {}. Value: {}", numberRedisKey, number);
+      return Right(number);
+    } else {
+      String message = "Number was not found in redis. Key: " + numberRedisKey;
+      LOGGER.warn(message);
+      return Left(new ConnectionError(message));
     }
   }
 }
