@@ -1,4 +1,6 @@
 micronaut:
+  server:
+    port: 8080
   application:
     name: NumbersManager
   router:
@@ -15,3 +17,10 @@ micronaut:
       swagger-ui:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger
+redis:
+  number-key: number
+  uri: redis://numbers-db:6379/1?timeout=5s
+random:
+  integer:
+    min: -100000
+    max: 100000
