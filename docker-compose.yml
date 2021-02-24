@@ -1,0 +1,30 @@
+version: "3"
+
+networks:
+  numbers-net:
+services:
+  numbers-db:
+    container_name: numbers-db
+    image: redis:alpine
+    networks:
+      - numbers-net
+    ports:
+      - 6379:6379
+  numbers-loader:
+    container_name: numbers-loader
+    image: redis
+    command: redis-cli -h numbers-db -n 1 set number 1
+    networks:
+      - numbers-net
+    depends_on:
+      - numbers-db
+  numbers-manager:
+    container_name: numbers-manager
+    build:
+      context: .
+    networks:
+      - numbers-net
+    ports:
+      - 8080:8080
+    depends_on:
+      - numbers-db
