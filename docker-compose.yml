@@ -5,13 +5,21 @@ networks:
 services:
   numbers-db:
     container_name: numbers-db
-    image: redis
+    image: redis:alpine
     networks:
       - numbers-net
     ports:
       - 6379:6379
-  numbers-api:
-    container_name: numbers-api
+  numbers-loader:
+    container_name: numbers-loader
+    image: redis
+    command: redis-cli -h numbers-db -n 1 set number 1
+    networks:
+      - numbers-net
+    depends_on:
+      - numbers-db
+  numbers-manager:
+    container_name: numbers-manager
     build:
       context: .
     networks:
